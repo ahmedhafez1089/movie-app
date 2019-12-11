@@ -1,5 +1,7 @@
 const express = require('express')
 const request = require('request');
+const fetch = require("node-fetch");
+const axios = require("axios");
 const Movie = require('../models/movie')
 const Credit = require('../models/credit')
 const router = new express.Router()
@@ -8,63 +10,56 @@ const apiKey = '38b114a997ec654bd7933e888cbf4921'
 
 router.get('/movie/:id', async (req,res) => {
     const movieID = req.params.id
-    
+    const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}?api_key=${apiKey}&language=en-US`
+
     try {
-        const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}?api_key=${apiKey}&language=en-US`
+        const response = await fetch(apiUrl);
+        const json = await response.json();
+        
+        if(json.status_code === 34){
+            return res.status(404).send(json)
+         } else if(json.status_code === 7){
+             return res.status(401).send(json)
+         }
 
-        await request({ url : apiUrl , json : true},(error,response) =>{
-            if(error){
-                res.status(500).send(error)
-            } else{
-                if(response.body.status_code === 34){
-                   return res.status(404).send(response.body)
-                } else if(response.body.status_code === 7){
-                    return res.status(401).send(response.body)
-                }
+         const movie = new Movie(json)
 
-                const movie = new Movie(response.body)
-
-                if(Movie.checkMovieExit(response.body.id)){
-                    movie.save()
-                }
-                
-                res.send(response.body)
-            }
-          });
-    } catch (e) {
-        res.status(500).send()        
-    }
+         if(Movie.checkMovieExit(json.id)){
+             movie.save()
+         }
+         
+         res.send(json)
+      } catch (e) {
+        res.status(500).send() 
+      }
 
 })
 
 router.get('/movie/:id/credits', async (req,res) => {
     const movieID = req.params.id
-     
-     try {
-         const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${apiKey}&language=en-US`
- 
-         await request({ url : apiUrl , json : true},(error,response) =>{
-             if(error){
-                 res.status(500).send(error)
-             } else{
-                 if(response.body.status_code === 34){
-                    return res.status(404).send(response.body)
-                 } else if(response.body.status_code === 7){
-                     return res.status(401).send(response.body)
-                 }
+    const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${apiKey}&language=en-US`
 
-                 const credit = new Credit(response.body)
+    try {
+        const response = await fetch(apiUrl);
+        const json = await response.json();
+        
+        if(json.status_code === 34){
+            return res.status(404).send(json)
+         } else if(json.status_code === 7){
+             return res.status(401).send(json)
+         }
+         
+         const credit = new Credit(json)
 
-                 if(Credit.checkMovieExitINCredits(response.body.id)){
-                    credit.save()
-                 }
-                
-                 res.send(response.body)
-             }
-           });
-     } catch (e) {
-         res.status(500).send()        
-    }
+         if(Credit.checkMovieExitINCredits(json.id)){
+            credit.save()
+         }
+                 
+         res.send(json)
+      } catch (e) {
+        res.status(500).send() 
+      }
+
 })
 
 module.exports = router

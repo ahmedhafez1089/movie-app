@@ -22,8 +22,6 @@ const creditSchema = new mongoose.Schema({
 creditSchema.statics.checkMovieExitINCredits = async (movieID) => {
     const movie = await Credit.findOne({ id : movieID })
 
-    console.log(movieID)
-
     if(movie){
         throw new Error('Unable to save credits')
     }
