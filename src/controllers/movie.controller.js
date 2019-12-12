@@ -1,14 +1,10 @@
-const express = require('express')
-const request = require('request');
-const fetch = require("node-fetch");
-const axios = require("axios");
-const Movie = require('../models/movie')
-const Credit = require('../models/credit')
-const router = new express.Router()
+const fetch = require("node-fetch")
+const Movie = require('../models/movie.model')
+const Credit = require('../models/credit.model')
 
 const apiKey = '38b114a997ec654bd7933e888cbf4921'
 
-router.get('/movie/:id', async (req,res) => {
+const getMovieDetails = async function (req, res, next) {
     const movieID = req.params.id
     const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}?api_key=${apiKey}&language=en-US`
 
@@ -22,7 +18,7 @@ router.get('/movie/:id', async (req,res) => {
              return res.status(401).send(json)
          }
 
-         const movie = new Movie(json)
+          const movie = new Movie(json)
 
          if(Movie.checkMovieExit(json.id)){
              movie.save()
@@ -32,10 +28,9 @@ router.get('/movie/:id', async (req,res) => {
       } catch (e) {
         res.status(500).send() 
       }
+}
 
-})
-
-router.get('/movie/:id/credits', async (req,res) => {
+const getMovieCredits = async function (req, res, next) {
     const movieID = req.params.id
     const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${apiKey}&language=en-US`
 
@@ -59,7 +54,9 @@ router.get('/movie/:id/credits', async (req,res) => {
       } catch (e) {
         res.status(500).send() 
       }
+}
 
-})
-
-module.exports = router
+module.exports = {
+    getMovieDetails , 
+    getMovieCredits
+}

@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const download = require('image-downloader')
+const fs = require('fs')
 
 const movieSchema = new mongoose.Schema({
     id : {
@@ -7,20 +9,19 @@ const movieSchema = new mongoose.Schema({
         unique : true 
     },
     title : {
-        type : String ,
-        required :true ,
+        type : String 
     },
     adult : {
-        type : Boolean ,
-        required : true
+        type : Boolean 
     },
     backdrop_path : {
-        type : String ,
-        required : true
+        type : String 
     },
-    belongs_to_collection : {
-        type : String
-    },
+    belongs_to_collection : [{
+        belongs_to_collection : {
+            type : String
+        }
+    }],
     budget : {
         type : Number
     },
@@ -106,6 +107,50 @@ movieSchema.statics.checkMovieExit = async (movieID) => {
 
     return true
 }
+
+movieSchema.pre('save', async function(next) {
+    const movie = this
+
+    const posterPath = 'http://image.tmdb.org/t/p/w1280' + movie.poster_path
+
+    const options = {
+       url: posterPath,
+       dest: 'D:/projects-nodejs/movie-app/public/movies-img/poster'
+     }
+
+     try {
+       const { filename, image } = await download.image(options)
+       movie.poster_path = filename
+     } catch (e) {
+       console.error(e)
+     }
+
+    next()
+})
+
+movieSchema.post('save', function(next) {
+    const movie = this
+    var movies = []
+    const movieAdd = {
+        id : movie.id ,
+        title  :movie.title
+    }
+    const fileLog = 'D:/projects-nodejs/movie-app/log.json'
+
+    try {
+        var logMovies = fs.readFileSync(fileLog)
+        movies = JSON.parse(logMovies)
+      } catch (e) {
+      }
+    
+    var duplicateMovies = movies.filter((_movie) => _movie.title === movie.title)
+
+    if (duplicateMovies.length === 0) {
+        movies.push(movieAdd);
+        fs.writeFileSync(fileLog, JSON.stringify(movies));
+      }
+    
+})
 
 const Movie = mongoose.model('Movie', movieSchema)
 
