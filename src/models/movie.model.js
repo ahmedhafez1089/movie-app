@@ -111,11 +111,11 @@ movieSchema.statics.checkMovieExit = async (movieID) => {
 movieSchema.pre('save', async function(next) {
     const movie = this
 
-    const posterPath = 'http://image.tmdb.org/t/p/w1280' + movie.poster_path
+    const posterPath = process.env.POSTER_PATH_URL + movie.poster_path
 
     const options = {
        url: posterPath,
-       dest: 'D:/projects-nodejs/movie-app/public/movies-img/poster'
+       dest: process.env.POSTER_PATH
      }
 
      try {
@@ -135,7 +135,7 @@ movieSchema.post('save', function(next) {
         id : movie.id ,
         title  :movie.title
     }
-    const fileLog = 'D:/projects-nodejs/movie-app/log.json'
+    const fileLog = process.env.LOG_FILE
 
     try {
         var logMovies = fs.readFileSync(fileLog)

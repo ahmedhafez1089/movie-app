@@ -2,11 +2,13 @@ const fetch = require("node-fetch")
 const Movie = require('../models/movie.model')
 const Credit = require('../models/credit.model')
 
-const apiKey = '38b114a997ec654bd7933e888cbf4921'
+const apiKey = process.env.API_KEY
+const apiPath = process.env.API_PATH
+const apiLanguage = process.env.API_LANGUAGE
 
 const getMovieDetails = async function (req, res, next) {
     const movieID = req.params.id
-    const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}?api_key=${apiKey}&language=en-US`
+    const apiUrl = apiPath + movieID + '?api_key=' + apiKey + '&language=' + apiLanguage
 
     try {
         const response = await fetch(apiUrl);
@@ -32,7 +34,7 @@ const getMovieDetails = async function (req, res, next) {
 
 const getMovieCredits = async function (req, res, next) {
     const movieID = req.params.id
-    const apiUrl = `https://api.themoviedb.org/3/movie/${movieID}/credits?api_key=${apiKey}&language=en-US`
+    const apiUrl = apiPath + movieID + '/credits?api_key=' + apiKey + '&language=' + apiLanguage
 
     try {
         const response = await fetch(apiUrl);
