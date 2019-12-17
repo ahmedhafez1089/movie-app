@@ -39,40 +39,49 @@ const getMovieDetails = async function (req, res, next) {
 }
 
 const getMovieCredits = async function (req, res, next) {
-    const movieID = req.params.id
-    const apiUrl = apiPath + movieID + '/credits?api_key=' + apiKey + '&language=' + apiLanguage
+    const user = await auth.auth(req, res)
 
-    try {
-        const response = await fetch(apiUrl);
-        const json = await response.json();
-        
-        if(json.status_code === 34){
-            return res.status(404).send(json)
-         } else if(json.status_code === 7){
-             return res.status(401).send(json)
-         }
-         
-         const credit = new Credit(json)
+    if(user){
+        const movieID = req.params.id
+        const apiUrl = apiPath + movieID + '/credits?api_key=' + apiKey + '&language=' + apiLanguage
+    
+        try {
+            const response = await fetch(apiUrl);
+            const json = await response.json();
+            
+            if(json.status_code === 34){
+                return res.status(404).send(json)
+             } else if(json.status_code === 7){
+                 return res.status(401).send(json)
+             }
+             
+             const credit = new Credit(json)
+    
+             if(Credit.checkMovieExitINCredits(json.id)){
+                credit.save()
+             }
+                     
+             res.send(json)
+          } catch (e) {
+            res.status(500).send() 
+          }
 
-         if(Credit.checkMovieExitINCredits(json.id)){
-            credit.save()
-         }
-                 
-         res.send(json)
-      } catch (e) {
-        res.status(500).send() 
-      }
+    }
 }
 
 const getMovieWithCreditsDetails = async function (req, res, next) {
-    try {
-        const movie = await Movie.findOne({ id : req.params.id })
-        await movie.populate({ path : 'credits' }).execPopulate()        
-        res.send(movie.credits)
-    } catch (e) {
-        res.status(500).send()
-    }
+    const user = await auth.auth(req, res)
 
+    if(user){
+        try {
+            const movie = await Movie.findOne({ id : req.params.id })
+            await movie.populate({ path : 'credits' }).execPopulate()        
+            res.send(movie.credits)
+        } catch (e) {
+            res.status(500).send()
+        }
+
+    }
 }
 
 module.exports = {
