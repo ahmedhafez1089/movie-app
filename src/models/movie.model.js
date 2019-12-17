@@ -18,17 +18,11 @@ const movieSchema = new mongoose.Schema({
         type : String 
     },
     belongs_to_collection : [{
-        belongs_to_collection : {
-            type : String
-        }
     }],
     budget : {
         type : Number
     },
     genres : [{
-        genre : {
-            type : String
-        }
     }],
     homepage : {
         type : String
@@ -52,14 +46,8 @@ const movieSchema = new mongoose.Schema({
         type : String
     },
     production_companies : [{
-        production_company : {
-            type : String
-        }
     }],
     production_countries : [{
-        production_country : {
-            type : String
-        }
     }],
     release_date : {
         type : String
@@ -71,9 +59,6 @@ const movieSchema = new mongoose.Schema({
         type : Number
     },
     spoken_languages : [{
-        spoken_language : {
-            type : String
-        }
     }],
     status : {
         type : String

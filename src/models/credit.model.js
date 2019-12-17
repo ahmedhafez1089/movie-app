@@ -4,18 +4,11 @@ const creditSchema = new mongoose.Schema({
     id : {
         type : mongoose.Schema.Types.Number , 
         required : true ,
-        ref : 'Movie' , 
-        unique : true
+        ref : 'Movie' 
     },
     cast : [{
-        cast : {
-            type : String
-        }
     }],
     crew : [{
-       crew : {
-           type : String
-       }
     }]
 })
 

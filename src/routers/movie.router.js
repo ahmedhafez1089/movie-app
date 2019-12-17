@@ -7,4 +7,6 @@ router.get('/movie/:id', MovieController.getMovieDetails)
 
 router.get('/movie/:id/credits', MovieController.getMovieCredits)
 
+router.get('/movieCredits/:id', MovieController.getMovieWithCreditsDetails)
+
 module.exports = router

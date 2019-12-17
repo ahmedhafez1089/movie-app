@@ -1,13 +1,17 @@
 const fetch = require("node-fetch")
 const Movie = require('../models/movie.model')
 const Credit = require('../models/credit.model')
+const auth = require('../middleware/auth')
 
 const apiKey = process.env.API_KEY
 const apiPath = process.env.API_PATH
 const apiLanguage = process.env.API_LANGUAGE
 
 const getMovieDetails = async function (req, res, next) {
-    const movieID = req.params.id
+    const user = await auth.auth(req, res)
+
+    if(user){
+        const movieID = req.params.id
     const apiUrl = apiPath + movieID + '?api_key=' + apiKey + '&language=' + apiLanguage
 
     try {
@@ -30,6 +34,8 @@ const getMovieDetails = async function (req, res, next) {
       } catch (e) {
         res.status(500).send() 
       }
+
+    }
 }
 
 const getMovieCredits = async function (req, res, next) {
@@ -58,7 +64,19 @@ const getMovieCredits = async function (req, res, next) {
       }
 }
 
+const getMovieWithCreditsDetails = async function (req, res, next) {
+    try {
+        const movie = await Movie.findOne({ id : req.params.id })
+        await movie.populate({ path : 'credits' }).execPopulate()        
+        res.send(movie.credits)
+    } catch (e) {
+        res.status(500).send()
+    }
+
+}
+
 module.exports = {
     getMovieDetails , 
-    getMovieCredits
+    getMovieCredits ,
+    getMovieWithCreditsDetails
 }
