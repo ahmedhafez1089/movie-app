@@ -22,7 +22,7 @@
     "mongodb": "^3.2.7",
     "mongoose": "^5.3.16",
     "node-fetch": "^2.6.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request": "^2.88.0",
     "validator": "^10.9.0"
   },
