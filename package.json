@@ -18,7 +18,7 @@
     "bcryptjs": "^2.4.3",
     "express": "^4.16.4",
     "image-downloader": "^3.5.0",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "mongodb": "^3.2.7",
     "mongoose": "^5.3.16",
     "node-fetch": "^2.6.0",
